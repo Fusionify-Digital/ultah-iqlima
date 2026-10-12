@@ -3,7 +3,7 @@ import { Canvas } from '@react-three/fiber'
 import { Sparkles } from '@react-three/drei'
 import Polaroids from '../three/Polaroids.jsx'
 import FallingPetals from '../three/FallingPetals.jsx'
-import { CameraRig, SceneEffects, SceneLights } from '../three/SceneBase.jsx'
+import { CameraRig, SceneEffects, SceneLights, canvasProps } from '../three/SceneBase.jsx'
 import { stageMotion } from '../components/stageMotion.js'
 import { config } from '../config.js'
 
@@ -15,7 +15,7 @@ export default function MemoriesStage({ onNext }) {
   return (
     <motion.section className="stage" {...stageMotion}>
       <div className="stage__canvas">
-        <Canvas camera={{ position: CAMERA, fov: 40 }} dpr={[1, 2]}>
+        <Canvas camera={{ position: CAMERA, fov: 40 }} {...canvasProps}>
           <CameraRig position={CAMERA} strength={0.25} introDistance={2} />
           <SceneLights />
           <Polaroids photos={memories.photos} />

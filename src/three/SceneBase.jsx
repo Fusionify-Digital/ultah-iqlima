@@ -8,6 +8,17 @@ const { damp } = THREE.MathUtils
 
 export const BACKGROUND = '#ffe8ef'
 
+// Phone GPUs flicker with the postprocessing render targets, so touch devices skip them.
+export const LOW_POWER =
+  typeof window !== 'undefined' && window.matchMedia('(pointer: coarse), (max-width: 768px)').matches
+
+// offsetSize ignores the CSS scale of stage transitions, which would otherwise
+// resize the canvas (and its render targets) on every animation frame.
+export const canvasProps = {
+  dpr: LOW_POWER ? [1, 1.5] : [1, 2],
+  resize: { offsetSize: true },
+}
+
 export function SceneLights() {
   return (
     <>
@@ -51,6 +62,7 @@ export function CameraRig({ position, target = [0, 0, 0], strength = 0.35, intro
 }
 
 export function SceneEffects({ bloom = 0.9 }) {
+  if (LOW_POWER) return null
   return (
     <EffectComposer>
       <Bloom mipmapBlur luminanceThreshold={1} luminanceSmoothing={0.15} intensity={bloom} />

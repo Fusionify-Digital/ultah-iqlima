@@ -72,6 +72,17 @@ button {
   opacity: 0.9;
 }
 
+/* Stand-in for the postprocessing vignette, which is disabled on phones. */
+@media (pointer: coarse), (max-width: 768px) {
+  .stage__canvas:not(.stage__canvas--soft)::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(110, 24, 56, 0.14) 100%);
+  }
+}
+
 .stage__overlay {
   position: absolute;
   inset: 0;

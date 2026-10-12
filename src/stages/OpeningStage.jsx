@@ -5,7 +5,7 @@ import { ContactShadows, PresentationControls, Sparkles } from '@react-three/dre
 import GiftBox from '../three/GiftBox.jsx'
 import FloatingHearts from '../three/FloatingHearts.jsx'
 import { Critter } from '../three/Critters.jsx'
-import { CameraRig, Fit, SceneEffects, SceneLights } from '../three/SceneBase.jsx'
+import { CameraRig, Fit, SceneEffects, SceneLights, canvasProps } from '../three/SceneBase.jsx'
 import AnimatedText from '../components/AnimatedText.jsx'
 import { stageMotion } from '../components/stageMotion.js'
 import { firework } from '../lib/celebrate.js'
@@ -37,7 +37,7 @@ export default function OpeningStage({ onStart, onDone }) {
   return (
     <motion.section className="stage" {...stageMotion}>
       <div className="stage__canvas">
-        <Canvas camera={{ position: CAMERA, fov: 40 }} dpr={[1, 2]}>
+        <Canvas camera={{ position: CAMERA, fov: 40 }} {...canvasProps}>
           <CameraRig position={CAMERA} />
           <SceneLights />
           <Fit width={4.3}>

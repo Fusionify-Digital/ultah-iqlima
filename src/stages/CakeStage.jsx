@@ -8,7 +8,7 @@ import FallingPetals from '../three/FallingPetals.jsx'
 import { Critter } from '../three/Critters.jsx'
 import AnimatedText from '../components/AnimatedText.jsx'
 import { stageMotion } from '../components/stageMotion.js'
-import { CameraRig, Fit, SceneEffects, SceneLights } from '../three/SceneBase.jsx'
+import { CameraRig, Fit, SceneEffects, SceneLights, canvasProps } from '../three/SceneBase.jsx'
 import { useBlowDetector } from '../hooks/useBlowDetector.js'
 import { celebrate, firework } from '../lib/celebrate.js'
 import WishPanel from '../components/WishPanel.jsx'
@@ -97,7 +97,7 @@ export default function CakeStage({ onNext }) {
   return (
     <motion.section className="stage" {...stageMotion} onPointerDown={tapFirework}>
       <div className="stage__canvas">
-        <Canvas camera={{ position: CAMERA, fov: 38 }} dpr={[1, 2]}>
+        <Canvas camera={{ position: CAMERA, fov: 38 }} {...canvasProps}>
           <CameraRig position={allOut ? CAMERA_WIDE : CAMERA} target={[0, 0.2, 0]} strength={0.3} />
           <SceneLights />
           <Fit width={5.9}>
