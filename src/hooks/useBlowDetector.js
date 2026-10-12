@@ -4,34 +4,60 @@ const THRESHOLD = 115
 const SUSTAIN_FRAMES = 6
 const COOLDOWN_MS = 260
 
+// iOS keeps audio in "call" mode (quiet, muffled) after the mic is released unless the
+// session type is reset explicitly. Unsupported browsers simply ignore this.
+function setAudioSession(type) {
+  try {
+    if (navigator.audioSession) navigator.audioSession.type = type
+  } catch {
+    // ignore
+  }
+}
+
 // Blowing into a mic produces loud broadband noise concentrated in the low bins.
 export function useBlowDetector(onBlow) {
   const [status, setStatus] = useState('idle')
   const [level, setLevel] = useState(0)
   const onBlowRef = useRef(onBlow)
   const cleanupRef = useRef(null)
+  const startingRef = useRef(false)
+  const aliveRef = useRef(true)
 
   useEffect(() => {
     onBlowRef.current = onBlow
   }, [onBlow])
 
-  const stop = useCallback(() => {
-    cleanupRef.current?.()
+  const release = useCallback(() => {
+    const cleanup = cleanupRef.current
     cleanupRef.current = null
-    setStatus('idle')
-    setLevel(0)
+    if (!cleanup) return
+    cleanup()
+    setAudioSession('playback')
   }, [])
 
+  const stop = useCallback(() => {
+    release()
+    setStatus('idle')
+    setLevel(0)
+  }, [release])
+
   const start = useCallback(async () => {
-    if (cleanupRef.current) return
+    if (cleanupRef.current || startingRef.current) return
     if (!navigator.mediaDevices?.getUserMedia) {
       setStatus('unsupported')
       return
     }
+    startingRef.current = true
+    setAudioSession('play-and-record')
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
       })
+      if (!aliveRef.current) {
+        stream.getTracks().forEach((t) => t.stop())
+        setAudioSession('playback')
+        return
+      }
       const ctx = new (window.AudioContext || window.webkitAudioContext)()
       const analyser = ctx.createAnalyser()
       analyser.fftSize = 512
@@ -66,15 +92,24 @@ export function useBlowDetector(onBlow) {
       cleanupRef.current = () => {
         cancelAnimationFrame(raf)
         stream.getTracks().forEach((t) => t.stop())
-        ctx.close()
+        ctx.close().catch(() => {})
       }
       setStatus('listening')
     } catch {
+      setAudioSession('playback')
       setStatus('denied')
+    } finally {
+      startingRef.current = false
     }
   }, [])
 
-  useEffect(() => () => cleanupRef.current?.(), [])
+  useEffect(() => {
+    aliveRef.current = true
+    return () => {
+      aliveRef.current = false
+      release()
+    }
+  }, [release])
 
   return { status, level, start, stop }
 }
