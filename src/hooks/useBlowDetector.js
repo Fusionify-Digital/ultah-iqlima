@@ -1,0 +1,80 @@
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+const THRESHOLD = 115
+const SUSTAIN_FRAMES = 6
+const COOLDOWN_MS = 260
+
+// Blowing into a mic produces loud broadband noise concentrated in the low bins.
+export function useBlowDetector(onBlow) {
+  const [status, setStatus] = useState('idle')
+  const [level, setLevel] = useState(0)
+  const onBlowRef = useRef(onBlow)
+  const cleanupRef = useRef(null)
+
+  useEffect(() => {
+    onBlowRef.current = onBlow
+  }, [onBlow])
+
+  const stop = useCallback(() => {
+    cleanupRef.current?.()
+    cleanupRef.current = null
+    setStatus('idle')
+    setLevel(0)
+  }, [])
+
+  const start = useCallback(async () => {
+    if (cleanupRef.current) return
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setStatus('unsupported')
+      return
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+      })
+      const ctx = new (window.AudioContext || window.webkitAudioContext)()
+      const analyser = ctx.createAnalyser()
+      analyser.fftSize = 512
+      ctx.createMediaStreamSource(stream).connect(analyser)
+      const data = new Uint8Array(analyser.frequencyBinCount)
+      const bins = Math.floor(data.length * 0.25)
+
+      let raf = 0
+      let loud = 0
+      let lastBlow = 0
+      let lastLevelUpdate = 0
+
+      const loop = (now) => {
+        analyser.getByteFrequencyData(data)
+        let sum = 0
+        for (let i = 0; i < bins; i++) sum += data[i]
+        const avg = sum / bins
+
+        loud = avg > THRESHOLD ? loud + 1 : Math.max(0, loud - 1)
+        if (loud >= SUSTAIN_FRAMES && now - lastBlow > COOLDOWN_MS) {
+          lastBlow = now
+          onBlowRef.current?.()
+        }
+        if (now - lastLevelUpdate > 80) {
+          lastLevelUpdate = now
+          setLevel(Math.min(1, avg / (THRESHOLD * 1.3)))
+        }
+        raf = requestAnimationFrame(loop)
+      }
+      raf = requestAnimationFrame(loop)
+
+      cleanupRef.current = () => {
+        cancelAnimationFrame(raf)
+        stream.getTracks().forEach((t) => t.stop())
+        ctx.close()
+      }
+      setStatus('listening')
+    } catch {
+      setStatus('denied')
+    }
+  }, [])
+
+  useEffect(() => () => cleanupRef.current?.(), [])
+
+  return { status, level, start, stop }
+}
