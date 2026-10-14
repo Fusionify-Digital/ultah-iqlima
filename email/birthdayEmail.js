@@ -32,7 +32,9 @@ export function dateInJakarta(now = new Date()) {
   return { year: parts.year, month: parts.month, day: parts.day }
 }
 
-export function renderBirthdayEmail({ siteUrl, now = new Date() }) {
+// With `inline`, images ship inside the email (cid: attachments) instead of being linked.
+// Gmail often withholds linked images from new senders, but always shows embedded ones.
+export function renderBirthdayEmail({ siteUrl, now = new Date(), inline = false }) {
   const today = dateInJakarta(now)
   const [, month, day] = birthDate.split('-').map(Number)
   const { age } = getBirthdayInfo(birthDate, new Date(today.year, today.month - 1, today.day))
@@ -43,6 +45,20 @@ export function renderBirthdayEmail({ siteUrl, now = new Date() }) {
   const base = siteUrl.replace(/\/$/, '')
   const subject = copy.subject(age)
   const paragraphs = copy.paragraphs(age)
+
+  const images = {
+    hero: { url: `${base}/email/hero.jpg`, filename: 'ulang-tahun.jpg' },
+    photo: { url: `${base}${photo.src}`, filename: `foto${photo.src.slice(photo.src.lastIndexOf('.'))}` },
+  }
+  const src = (key) => (inline ? `cid:${key}@ultah-iqlima` : images[key].url)
+  const attachments = inline
+    ? Object.entries(images).map(([key, img]) => ({
+        filename: img.filename,
+        href: img.url,
+        cid: `${key}@ultah-iqlima`,
+        contentDisposition: 'inline',
+      }))
+    : []
 
   const p = (text) =>
     `<p style="margin:0 0 18px;font-family:${SERIF};font-size:20px;line-height:1.65;color:${C.ink};">${esc(text)}</p>`
@@ -75,7 +91,7 @@ export function renderBirthdayEmail({ siteUrl, now = new Date() }) {
         <tr>
           <td>
             <a href="${esc(base)}" target="_blank" style="text-decoration:none;">
-              <img src="${esc(base)}/email/hero.jpg" width="600" alt="Selamat ulang tahun, ${esc(config.name)}" style="width:100%;max-width:600px;height:auto;background:${C.page};font-family:${SCRIPT};font-size:40px;color:${C.pink};text-align:center;" />
+              <img src="${esc(src('hero'))}" width="600" alt="Selamat ulang tahun, ${esc(config.name)}" style="width:100%;max-width:600px;height:auto;background:${C.page};font-family:${SCRIPT};font-size:40px;color:${C.pink};text-align:center;" />
             </a>
           </td>
         </tr>
@@ -95,7 +111,7 @@ export function renderBirthdayEmail({ siteUrl, now = new Date() }) {
             <table role="presentation" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="background:#ffffff;border:1px solid ${C.line};box-shadow:0 18px 30px -16px rgba(194,24,91,0.4);transform:rotate(-2deg);">
               <tr>
                 <td style="padding:14px 14px 0;">
-                  <img class="photo" src="${esc(base)}${esc(photo.src)}" width="250" height="250" alt="${esc(photo.caption)}" style="width:250px;height:250px;object-fit:cover;background:${C.line};" />
+                  <img class="photo" src="${esc(src('photo'))}" width="250" height="250" alt="${esc(photo.caption)}" style="width:250px;height:250px;object-fit:cover;background:${C.line};" />
                 </td>
               </tr>
               <tr>
@@ -149,5 +165,5 @@ export function renderBirthdayEmail({ siteUrl, now = new Date() }) {
     config.letter.signature,
   ].join('\n')
 
-  return { age, isBirthday, subject, html, text }
+  return { age, isBirthday, subject, html, text, attachments }
 }

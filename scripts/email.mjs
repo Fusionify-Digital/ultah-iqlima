@@ -18,7 +18,7 @@ if (mode === 'preview') {
   const url = siteUrl()
   if (!url) throw new Error('Isi SITE_URL di .env.local dengan alamat web yang sudah online, supaya gambarnya bisa dimuat')
   const to = process.env.TEST_EMAIL_TO || process.env.GMAIL_USER
-  const email = renderBirthdayEmail({ siteUrl: url, now })
+  const email = renderBirthdayEmail({ siteUrl: url, now, inline: true })
   const info = await sendEmail({ to, ...email })
   console.log(`Terkirim ke ${to} (${info.messageId})`)
 } else {

@@ -8,7 +8,7 @@ export function siteUrl() {
 }
 
 // Sends through Gmail SMTP with an App Password (https://myaccount.google.com/apppasswords).
-export async function sendEmail({ to, subject, html, text }) {
+export async function sendEmail({ to, subject, html, text, attachments = [] }) {
   const user = process.env.GMAIL_USER
   const pass = process.env.GMAIL_APP_PASSWORD
   if (!user || !pass) throw new Error('GMAIL_USER dan GMAIL_APP_PASSWORD belum diatur')
@@ -20,5 +20,6 @@ export async function sendEmail({ to, subject, html, text }) {
     subject,
     html,
     text,
+    attachments,
   })
 }

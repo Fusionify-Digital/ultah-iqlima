@@ -10,7 +10,7 @@ export async function GET(request) {
   }
 
   const test = new URL(request.url).searchParams.has('test')
-  const email = renderBirthdayEmail({ siteUrl: siteUrl() })
+  const email = renderBirthdayEmail({ siteUrl: siteUrl(), inline: true })
 
   if (!test && !email.isBirthday) {
     return Response.json({ sent: false, reason: 'Hari ini bukan hari ulang tahunnya' })
