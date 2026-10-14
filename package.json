@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "email:preview": "node --env-file-if-exists=.env.local scripts/email.mjs preview --date=2027-07-27",
+    "email:test": "node --env-file-if-exists=.env.local scripts/email.mjs send --date=2027-07-27"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",
@@ -14,6 +16,7 @@
     "@react-three/postprocessing": "^3.2.0",
     "canvas-confetti": "^1.9.4",
     "motion": "^14.1.0",
+    "nodemailer": "^10.1.1",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "three": "^0.186.1"

@@ -1,11 +1,41 @@
 import { getBirthdayInfo } from './lib/birthday.js'
 
 // Ganti semua isi di file ini sesuai keinginanmu.
-const birthDate = '2003-07-27'
+export const birthDate = '2003-07-27'
 
 export const birthday = getBirthdayInfo(birthDate)
 const { age, dayMonth } = birthday
 const [, month, day] = birthDate.split('-')
+
+// Kartu harapan: jumlahnya mengikuti umur, yaitu (umur - 1) harapan pertama di sini
+// ditambah satu kartu penutup. Tambah harapan baru kalau umurnya bertambah.
+const WISHES = [
+  'Semoga kamu selalu punya alasan untuk tersenyum, sekecil apa pun itu.',
+  'Semoga kamu selalu sehat, badanmu dan juga hatimu.',
+  'Semoga setiap doa yang kamu bisikkan pelan-pelan dikabulkan.',
+  'Semoga kamu dikelilingi orang-orang yang tulus sayang sama kamu.',
+  'Semoga rezekimu lancar, dari arah yang bahkan nggak kamu duga.',
+  'Semoga kamu berani mengejar hal-hal yang kamu impikan.',
+  'Semoga capekmu selalu terbayar dengan hasil yang manis.',
+  'Semoga kamu ingat untuk istirahat setiap kali lelah.',
+  'Semoga kamu makin sayang sama dirimu sendiri.',
+  'Semoga hari-hari beratmu cepat lewat, dan yang indah lebih lama tinggal.',
+  'Semoga kamu nggak pernah kehilangan rasa penasaranmu.',
+  'Semoga keluargamu selalu sehat dan bahagia.',
+  'Semoga kamu selalu dikuatkan saat sesuatu nggak berjalan sesuai rencana.',
+  'Semoga tawamu selalu lebih banyak dari air matamu.',
+  'Semoga kamu menemukan hal-hal baru yang bikin kamu jatuh cinta sama hidup.',
+  'Semoga semua yang kamu kerjakan dimudahkan dan diberkahi.',
+  'Semoga kamu selalu jadi dirimu sendiri, apa adanya.',
+  'Semoga hatimu selalu tenang, apa pun yang terjadi di luar sana.',
+  'Semoga harimu selalu seindah mawar dan lily kesukaanmu.',
+  'Semoga kamu nggak pernah ragu kalau kamu itu berharga.',
+  'Semoga rasa syukurmu selalu bikin kamu bahagia.',
+  'Semoga tahun ini jadi bab paling indah dalam ceritamu.',
+  'Semoga kamu selalu dipertemukan dengan kesempatan-kesempatan baik.',
+  'Semoga setiap pagi kamu bangun dengan hati yang ringan.',
+  'Semoga semua yang kamu sayangi selalu ada di dekatmu.',
+]
 
 export const config = {
   name: 'Iqlima',
@@ -96,28 +126,7 @@ export const config = {
     next: 'Ada surat buat kamu',
     end: 'dan semua hal baik lainnya',
     items: [
-      'Semoga kamu selalu punya alasan untuk tersenyum, sekecil apa pun itu.',
-      'Semoga kamu selalu sehat, badanmu dan juga hatimu.',
-      'Semoga setiap doa yang kamu bisikkan pelan-pelan dikabulkan.',
-      'Semoga kamu dikelilingi orang-orang yang tulus sayang sama kamu.',
-      'Semoga rezekimu lancar, dari arah yang bahkan nggak kamu duga.',
-      'Semoga kamu berani mengejar hal-hal yang kamu impikan.',
-      'Semoga capekmu selalu terbayar dengan hasil yang manis.',
-      'Semoga kamu ingat untuk istirahat setiap kali lelah.',
-      'Semoga kamu makin sayang sama dirimu sendiri.',
-      'Semoga hari-hari beratmu cepat lewat, dan yang indah lebih lama tinggal.',
-      'Semoga kamu nggak pernah kehilangan rasa penasaranmu.',
-      'Semoga keluargamu selalu sehat dan bahagia.',
-      'Semoga kamu selalu dikuatkan saat sesuatu nggak berjalan sesuai rencana.',
-      'Semoga tawamu selalu lebih banyak dari air matamu.',
-      'Semoga kamu menemukan hal-hal baru yang bikin kamu jatuh cinta sama hidup.',
-      'Semoga semua yang kamu kerjakan dimudahkan dan diberkahi.',
-      'Semoga kamu selalu jadi dirimu sendiri, apa adanya.',
-      'Semoga hatimu selalu tenang, apa pun yang terjadi di luar sana.',
-      'Semoga harimu selalu seindah mawar dan lily kesukaanmu.',
-      'Semoga kamu nggak pernah ragu kalau kamu itu berharga.',
-      'Semoga rasa syukurmu selalu bikin kamu bahagia.',
-      'Semoga tahun ini jadi bab paling indah dalam ceritamu.',
+      ...WISHES.slice(0, age - 1),
       `Dan semoga, di umur ${age} ini, kamu bahagia dengan caramu sendiri, Iqlima.`,
     ],
   },
@@ -135,5 +144,24 @@ export const config = {
     quote: ['Cantikmu berasal dari bahagiamu,', 'dan bahagiamu berasal dari rasa syukurmu.'],
     closing: 'Selamat ulang tahun, sekali lagi.',
     signature: 'Aku',
+  },
+
+  // Email otomatis yang dikirim tepat di hari ulang tahunnya (lihat README).
+  // `age` diisi saat email dikirim, karena server berjalan di zona waktu UTC.
+  email: {
+    fromName: 'Untuk Iqlima ♡',
+    subject: (age) => `Selamat ulang tahun ke-${age}, Iqlima ♡`,
+    preheader: 'Ada kado kecil yang sudah menunggu untuk kamu buka.',
+    eyebrow: (age) => `${dayMonth} · ${age} tahun`,
+    greeting: 'Hai, Iqlima,',
+    paragraphs: (age) => [
+      `Selamat ulang tahun yang ke-${age}, ya. Hari ini, ${dayMonth}, adalah harimu, dan semoga jadi awal dari tahun yang paling baik buat kamu.`,
+      'Semoga di umur yang baru ini kamu makin bahagia, makin sehat, dan semua hal baik datang ke kamu tanpa perlu kamu kejar terlalu keras.',
+    ],
+    // Foto yang ditampilkan, nomor urut dari memories.photos (mulai dari 0)
+    photo: 0,
+    invite: 'Ada kado kecil yang sudah menunggu untuk kamu buka. Kuncinya? Tanggal dan bulan lahirmu.',
+    button: 'Buka kadonya',
+    footer: 'Dikirim tepat di awal hari spesialmu',
   },
 }
