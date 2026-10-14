@@ -73,7 +73,7 @@ Setelah itu lakukan **Redeploy** supaya variabelnya terbaca.
 ### 3. Tes kirim ke emailmu sendiri
 
 ```bash
-curl -H "Authorization: Bearer ISI_CRON_SECRET" "https://DOMAIN-KAMU.vercel.app/api/birthday-email?test=1"
+curl -H "Authorization: Bearer ISI_CRON_SECRET" "https://ultah-iqlima.studydate.id/api/birthday-email?test=1"
 ```
 
 Dengan `?test=1`, email dikirim ke `TEST_EMAIL_TO` dan bisa dicoba kapan saja. Tanpa `?test=1`, email hanya terkirim ke dia kalau hari ini memang 27 Juli (WIB).
@@ -84,7 +84,7 @@ Bisa juga dari komputer: salin `.env.example` jadi `.env.local`, isi, lalu jalan
 
 Buat cronjob baru:
 
-- **URL**: `https://DOMAIN-KAMU.vercel.app/api/birthday-email`
+- **URL**: `https://ultah-iqlima.studydate.id/api/birthday-email`
 - **Schedule**: pilih *Custom*, zona waktu **Asia/Jakarta**, menit `1`, jam `0`, tanggal `27`, bulan `Juli`
 - **Advanced → Headers**: `Authorization` = `Bearer ISI_CRON_SECRET`
 
@@ -92,4 +92,4 @@ Tombol *Test run* di cron-job.org aman dipakai. Di luar 27 Juli, fungsinya hanya
 
 ## Deploy
 
-Dideploy di [Vercel](https://vercel.com): import repo ini, framework terdeteksi otomatis sebagai Vite. URL preview link (`og:image`) diisi otomatis dari domain Vercel saat build. Untuk domain lain, set environment variable `SITE_URL`, misalnya `https://contoh.com`.
+Live di [ultah-iqlima.studydate.id](https://ultah-iqlima.studydate.id), dideploy di [Vercel](https://vercel.com): import repo ini, framework terdeteksi otomatis sebagai Vite. URL preview link (`og:image`) diisi otomatis dari domain Vercel saat build. Untuk domain lain, set environment variable `SITE_URL`, misalnya `https://contoh.com`.
